@@ -1,0 +1,22 @@
+---
+title: "write_in_rasterComposite"
+output: html_document
+date: "2025-05-08"
+---
+```{r}
+raster_layer <- rast(file.path(output, "Percent_T1_Cover_T1_Ref_Cover_AuAl.tif")) #read in the raster layer
+
+raster_composite <- rast(file.path("Z:/GIS/Data_SDU/Project2.3VSS/VSS7_input/patch_l1_prediction_250501143714_0000.tif")) #read in the raster composite
+
+Grids_shp <- vect(file.path("Z:/GIS/Data_SDU/Grid/Grid_subset_v2.shp")) #read in the shapefile of 280 grids
+Grids_shp$ID <- 0:nrow(Grids_shp)
+individual_grid <- terra::subset(Grids_shp, Grids_shp$ID == "00") #select a single polygon
+
+raster_layer_in_grid <- terra::crop(T1Cover_ratio_layer, tile43, snap = "out") #crop the layer to the individual grid
+
+crs(raster_composite) <- crs(raster_layer_in_grid)
+composite <- c(raster_composite, raster_layer_in_grid) #merge the raster into the composite
+
+writeRaster(VSA_ratioLayer_composite, file.path("Z:GIS/Data_SDU/Project2.3VSS/VSS10_input/patch_l1_prediction_250501143714_0000.tif"), filetype = "GTiff", datatype = 'FLT4S', overwrite = TRUE) 
+```
+
